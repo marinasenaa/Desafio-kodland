@@ -24,7 +24,6 @@ button_sound = Rect(300, 275, 200, 60)
 button_restart = Rect(300, 350, 200, 60)
 button_exit = Rect(300, 425, 200, 60)
 
-
 player_dead= False 
 orc_dead= False 
 is_attacking = False 
@@ -42,7 +41,6 @@ orc_life = 100
 player_damage = 10
 orc_damage = 8
 orcAttackCooldown = 5.0
-walkSpeed = 5000
 
 playerDirection = "right"
 canOrcAttack = True
@@ -69,7 +67,7 @@ orcDeath = {'left': ['orc_dead0.png', 'orc_dead1.png', 'orc_dead2.png', 'orc_dea
 
 def update():
     global state
-    clock.tick(60)#SE REMOVER MEU ORC NÃO COMPLETA A ANIMAÇÃO
+    clock.tick(90)#SE REMOVER MEU ORC NÃO COMPLETA A ANIMAÇÃO, pq ele que ta forçando a atualizar fazendo com que a nimação fique correta
 
     if state == 'MENU':
         return  
@@ -142,18 +140,16 @@ def draw():
 def move_player():
     global playerDirection, is_attacking, runFrame
 
-    if player_dead:
+    if player_dead or is_attacking:
         return
-    
-     
     moving = False
-
+    
     if keyboard.RIGHT and player.x < WIDTH:
         playerDirection = "right"
         if not is_attacking:
             player.image = playerRun[playerDirection][runFrame]
             runFrame = (runFrame + 1) % len(playerRun[playerDirection])
-            clock.schedule_interval(lambda: move_player(), 3000)
+            clock.schedule(lambda: move_player(), 0.5)
         player.x += 5
         moving = True
 
@@ -162,11 +158,11 @@ def move_player():
         if not is_attacking:
             player.image = playerRun[playerDirection][runFrame]
             runFrame = (runFrame + 1) % len(playerRun[playerDirection])
-            schedule(lambda: move_player(), 5000)
+            clock.schedule(lambda: move_player(), 0.5)
         player.x -= 5
         moving = True
 
-    if not moving and not is_attacking:
+    if not moving:
         player.image = playerIdle[playerDirection][0]
 
     if keyboard.k and not is_attacking:
@@ -192,7 +188,7 @@ def animate_attack():
     if attackFrame < len(playerAttack[playerDirection]):
         player.image = playerAttack[playerDirection][attackFrame]
         attackFrame += 1
-        clock.schedule_interval(animate_attack, 5000)
+        clock.schedule(animate_attack, 0.5)
     else:
         attackFrame = 0
         attack = False
